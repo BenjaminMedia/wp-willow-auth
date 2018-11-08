@@ -1,0 +1,22 @@
+{
+    "name": "bonnier/wp-willow-auth",
+    "description": "A WP plugin for integrating with willow auth",
+    "type": "wordpress-plugin",
+    "require": {
+        "bonnier/willow-mu-plugins": "^1.2"
+    },
+    "require-dev": {
+        "johnpbloch/wordpress": "^4.9"
+    },
+    "authors": [
+        {
+            "name": "Bonnier Interactive",
+            "email": "interactive@bonnier.dk"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Bonnier\\WP\\WillowAuth\\": "src"
+        }
+    }
+}
