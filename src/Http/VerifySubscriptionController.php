@@ -28,8 +28,8 @@ class VerifySubscriptionController extends BaseController
         try {
             $response = $this->client->post('users/verifySubscription', [
                 RequestOptions::JSON => [
-                    'subscription_number' => $request->get_param('subscriptionNumber'),
-                    'postal_code' => $request->get_param('postalCode'),
+                    'subscription_number' => $request->get_param('subscription_number'),
+                    'postal_code' => $request->get_param('postal_code'),
                     'locale' => LanguageProvider::getCurrentLanguage(),
                     'brand_code' => WpSiteManager::instance()->settings()->getSite()->brand->brand_code ?? null,
                 ],

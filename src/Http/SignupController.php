@@ -27,14 +27,14 @@ class SignupController extends BaseController
         try {
             $response = $this->client->post('users/create', [
                 RequestOptions::JSON => [
-                    'name' => $request->get_param('firstName'),
-                    'family_name' => $request->get_param('lastName'),
+                    'name' => $request->get_param('first_name'),
+                    'family_name' => $request->get_param('last_name'),
                     'email' => $request->get_param('email'),
-                    'subscription_number' => (string)$request->get_param('subscriptionNumber'),
-                    'postal_code' => (string)$request->get_param('postalCode'),
+                    'subscription_number' => (string)$request->get_param('subscription_number'),
+                    'postal_code' => (string)$request->get_param('postal_code'),
+                    'password' => $request->get_param('password'),
                     'locale' => LanguageProvider::getCurrentLanguage(),
                     'brand' =>  WpSiteManager::instance()->settings()->getSite()->brand->brand_code ?? null,
-                    'password' => $request->get_param('password')
                 ],
             ]);
         } catch (\Exception $exception) {

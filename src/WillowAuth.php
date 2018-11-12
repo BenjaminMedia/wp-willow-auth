@@ -25,11 +25,25 @@ class WillowAuth
 
     private function __construct()
     {
-        $client = new Client([
-            'base_uri' => getenv('WILLOW_AUTH_ENDPOINT')
-        ]);
+        if ($authEndpoint = $this->getAuthEndpoint()) {
+            $client = new Client([
+                'base_uri' => $authEndpoint
+            ]);
+            new VerifySubscriptionController($client);
+            new SignupController($client);
+        }
+    }
 
-        new VerifySubscriptionController($client);
-        new SignupController($client);
+    private function getAuthEndpoint()
+    {
+        if (! $authEndpoint = env('WILLOW_AUTH_ENDPOINT')) {
+            add_action('admin_notices', function () {
+                echo sprintf(
+                    '<div class="error notice"><p>%s</p></div>',
+                    "WILLOW_AUTH_ENDPOINT not present in the .env file!"
+                );
+            });
+        }
+        return $authEndpoint;
     }
 }
