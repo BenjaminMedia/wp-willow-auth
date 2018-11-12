@@ -3,7 +3,9 @@
 
 namespace Bonnier\WP\WillowAuth;
 
-use Bonnier\WP\UserFavourites\Http\Controller;
+use Bonnier\WP\WillowAuth\Http\SignupController;
+use Bonnier\WP\WillowAuth\Http\VerifySubscriptionController;
+use GuzzleHttp\Client;
 
 class WillowAuth
 {
@@ -23,12 +25,25 @@ class WillowAuth
 
     private function __construct()
     {
-        add_action('rest_api_init', [__CLASS__, 'registerApiControllers']);
+        if ($authEndpoint = $this->getAuthEndpoint()) {
+            $client = new Client([
+                'base_uri' => $authEndpoint
+            ]);
+            new VerifySubscriptionController($client);
+            new SignupController($client);
+        }
     }
 
-    public static function registerApiControllers()
+    private function getAuthEndpoint()
     {
-        $controller = new Controller();
-        $controller->register_routes();
+        if (! $authEndpoint = env('WILLOW_AUTH_ENDPOINT')) {
+            add_action('admin_notices', function () {
+                echo sprintf(
+                    '<div class="error notice"><p>%s</p></div>',
+                    "WILLOW_AUTH_ENDPOINT not present in the .env file!"
+                );
+            });
+        }
+        return $authEndpoint;
     }
 }
