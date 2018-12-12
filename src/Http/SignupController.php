@@ -38,6 +38,9 @@ class SignupController extends BaseController
                 ],
             ]);
         } catch (\Exception $exception) {
+            if (str_contains($exception->getMessage(), 'UsernameExistsException')) {
+                return new WP_REST_Response(['message' => 'A user already exists with that email'], 409);
+            }
             return new WP_REST_Response(null, 400);
         }
 
