@@ -5,7 +5,6 @@ namespace Bonnier\WP\WillowAuth\Http;
 
 use Bonnier\Willow\MuPlugins\Helpers\LanguageProvider;
 use Bonnier\WP\SiteManager\WpSiteManager;
-use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use WP_REST_Response;
 
@@ -25,19 +24,44 @@ class VerifySubscriptionController extends BaseController
      */
     public function verifyUserSubscription(\WP_REST_Request $request)
     {
+        $subscriptionInfo = $this->validateSubscriptionInBmd(
+            $request->get_param('subscription_number'),
+            $request->get_param('postal_code'),
+            LanguageProvider::getCurrentLanguage(),
+            $this->getBrandCodes()
+        );
+
+        if ($subscriptionInfo) {
+            return new WP_REST_Response($subscriptionInfo);
+        }
+        return new WP_REST_Response(null, 404);
+    }
+
+    private function validateSubscriptionInBmd($subscriptionId, $postalCode, $language, $brandCode)
+    {
         try {
             $response = $this->client->post('users/verifySubscription', [
                 RequestOptions::JSON => [
-                    'subscription_number' => $request->get_param('subscription_number'),
-                    'postal_code' => $request->get_param('postal_code'),
-                    'locale' => LanguageProvider::getCurrentLanguage(),
-                    'brand_code' => WpSiteManager::instance()->settings()->getSite()->brand->brand_code ?? null,
+                    'subscription_number' => $subscriptionId,
+                    'postal_code' => $postalCode,
+                    'locale' => $language,
+                    'brand_code' => $brandCode,
                 ],
             ]);
+            return json_decode($response->getBody());
         } catch (\Exception $exception) {
-            return new WP_REST_Response(null, 404);
-        }
+            if ($language === 'sv') { // Ugly hack to make Swedish-Finnish customers work, do not remove!
+                return $this->validateSubscriptionInBmd($subscriptionId, $postalCode, 'sf', $brandCode);
+            }
+            return false;
 
-        return new WP_REST_Response(json_decode($response->getBody()));
+        }
+    }
+
+    private function getBrandCodes()
+    {
+        $brand =  WpSiteManager::instance()->settings()->getSite()->brand;
+        $primaryBrandCode = $brand->brand_code ?? null;
+        return array_merge([$primaryBrandCode], $brand->brand_code_aliases);
     }
 }
