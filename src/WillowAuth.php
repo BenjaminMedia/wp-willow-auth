@@ -3,6 +3,7 @@
 
 namespace Bonnier\WP\WillowAuth;
 
+use Bonnier\WP\WillowAuth\Http\LookupController;
 use Bonnier\WP\WillowAuth\Http\SignupController;
 use Bonnier\WP\WillowAuth\Http\VerifySubscriptionController;
 use GuzzleHttp\Client;
@@ -31,6 +32,7 @@ class WillowAuth
             ]);
             new VerifySubscriptionController($client);
             new SignupController($client);
+            new LookupController($client);
         }
     }
 
