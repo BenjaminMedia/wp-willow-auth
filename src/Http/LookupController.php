@@ -2,7 +2,6 @@
 
 namespace Bonnier\WP\WillowAuth\Http;
 
-use Bonnier\WP\SiteManager\WpSiteManager;
 use GuzzleHttp\RequestOptions;
 use WP_REST_Response;
 
@@ -25,14 +24,12 @@ class LookupController extends BaseController
         try {
             $response = $this->client->post('users/lookup', [
                 RequestOptions::JSON => [
-                    'email' => $request->get_param('email'),
-                    'brand' =>  WpSiteManager::instance()->settings()->getSite()->brand->brand_code ?? null,
+                    'email' => $request->get_param('email')
                 ],
             ]);
+            return new WP_REST_Response(json_decode($response->getBody()));
         } catch (\Exception $exception) {
             return new WP_REST_Response(null, 404);
         }
-
-        return new WP_REST_Response(json_decode($response->getBody()));
     }
 }
