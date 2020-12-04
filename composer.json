@@ -3,7 +3,7 @@
     "description": "A WP plugin for integrating with willow auth",
     "type": "wordpress-plugin",
     "require": {
-        "bonnier/willow-mu-plugins": "^1.2"
+        "bonnier/willow-mu-plugins": "^2.0"
     },
     "require-dev": {
         "johnpbloch/wordpress": "^4.9"
