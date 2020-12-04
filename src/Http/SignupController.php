@@ -24,18 +24,29 @@ class SignupController extends BaseController
      */
     public function signup(\WP_REST_Request $request)
     {
+        $signupData = [
+            'name' => $request->get_param('first_name'),
+            'family_name' => $request->get_param('last_name'),
+            'email' => $request->get_param('email'),
+            'subscription_number' => (string)$request->get_param('subscription_number'),
+            'postal_code' => (string)$request->get_param('postal_code'),
+            'password' => $request->get_param('password'),
+            'locale' => LanguageProvider::getCurrentLanguage(),
+            'brand' =>  WpSiteManager::instance()->settings()->getSite()->brand->brand_code ?? null,
+        ];
+
+        $isSubscriber = $request->get_param('is_subscriber');
+        if ($isSubscriber !== null && in_array($isSubscriber, ["0","1"])){
+            $signupData ['is_subscriber'] =$isSubscriber;
+        }
+
+        if ($createdBy = $request->get_param('created_by')){
+            $signupData ['created_by'] =$createdBy;
+        }
+
         try {
             $response = $this->client->post('users/create', [
-                RequestOptions::JSON => [
-                    'name' => $request->get_param('first_name'),
-                    'family_name' => $request->get_param('last_name'),
-                    'email' => $request->get_param('email'),
-                    'subscription_number' => (string)$request->get_param('subscription_number'),
-                    'postal_code' => (string)$request->get_param('postal_code'),
-                    'password' => $request->get_param('password'),
-                    'locale' => LanguageProvider::getCurrentLanguage(),
-                    'brand' =>  WpSiteManager::instance()->settings()->getSite()->brand->brand_code ?? null,
-                ],
+                RequestOptions::JSON => $signupData,
             ]);
         } catch (\Exception $exception) {
             if (str_contains($exception->getMessage(), 'UsernameExistsException')) {
