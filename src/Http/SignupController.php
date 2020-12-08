@@ -28,12 +28,16 @@ class SignupController extends BaseController
             'name' => $request->get_param('first_name'),
             'family_name' => $request->get_param('last_name'),
             'email' => $request->get_param('email'),
-            'subscription_number' => (string)$request->get_param('subscription_number'),
             'postal_code' => (string)$request->get_param('postal_code'),
             'password' => $request->get_param('password'),
             'locale' => LanguageProvider::getCurrentLanguage(),
             'brand' =>  WpSiteManager::instance()->settings()->getSite()->brand->brand_code ?? null,
         ];
+
+        $subscriptionNumber = $request->get_param('subscription_number');
+        if ($subscriptionNumber !== null){
+            $signupData ['subscription_number'] = (string)$subscriptionNumber;
+        }
 
         $isSubscriber = $request->get_param('is_subscriber');
         if ($isSubscriber !== null && in_array($isSubscriber, ["0","1"])){
@@ -49,7 +53,7 @@ class SignupController extends BaseController
                 RequestOptions::JSON => $signupData,
             ]);
         } catch (\Exception $exception) {
-            if (str_contains($exception->getMessage(), 'UsernameExistsException')) {
+            if (strpos($exception->getMessage(), 'UsernameExistsException') !== false) {
                 return new WP_REST_Response(['message' => 'A user already exists with that email'], 409);
             }
             return new WP_REST_Response(null, 400);
