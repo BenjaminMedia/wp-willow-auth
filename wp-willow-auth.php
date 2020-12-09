@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: Willow Auth
- * Version: 3.2.0
+ * Version: 3.2.1
  * Plugin URI: https://github.com/BenjaminMedia/wp-willow-auth
  * Description: A plugin for integrating with willow auth
- * Author: Bonnier Publications - Alf Henderson
+ * Author: Bonnier Publications
  * License: GPL v3
  */
 

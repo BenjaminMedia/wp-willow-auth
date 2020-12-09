@@ -34,6 +34,11 @@ class SignupController extends BaseController
             'brand' =>  WpSiteManager::instance()->settings()->getSite()->brand->brand_code ?? null,
         ];
 
+        $address = $request->get_param('address');
+        if ($address !== null){
+            $signupData ['address'] = $address;
+        }
+
         $subscriptionNumber = $request->get_param('subscription_number');
         if ($subscriptionNumber !== null){
             $signupData ['subscription_number'] = (string)$subscriptionNumber;
@@ -56,7 +61,7 @@ class SignupController extends BaseController
             if (strpos($exception->getMessage(), 'UsernameExistsException') !== false) {
                 return new WP_REST_Response(['message' => 'A user already exists with that email'], 409);
             }
-            return new WP_REST_Response(null, 400);
+            return new WP_REST_Response($exception->getMessage(), 400);
         }
 
         return new WP_REST_Response(json_decode($response->getBody()));
