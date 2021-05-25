@@ -50,21 +50,32 @@ class VerifySubscriptionController extends BaseController
             ]);
             return json_decode($response->getBody());
         } catch (\Exception $exception) {
-            if ($exception->getCode() == 404) {
-                $message = $exception->getMessage();
-                $messageNoSubscriptionFound = '{"message":"No subscription found."}';
-                if (stripos($message, $messageNoSubscriptionFound) !== false) {
-                    return json_decode($messageNoSubscriptionFound);
+            $code = $exception->getCode();
+            $message = $exception->getMessage();
+
+            if ($code == 400) {
+                $messageSubscriptionNrFormatNotValid = '{"message":"SubscriptionNrFormatNotValid"}';
+                if (stripos($message, $messageSubscriptionNrFormatNotValid) !== false) {
+                    return json_decode($messageSubscriptionNrFormatNotValid);
                 }
                 $messageUnknown = '{"message":"Unknown"}';
                 if (stripos($message, $messageUnknown) !== false) {
                     return json_decode($messageUnknown);
                 }
             }
+            
+            if ($code == 404) {
+                $messageNoSubscriptionFound = '{"message":"No subscription found."}';
+                if (stripos($message, $messageNoSubscriptionFound) !== false) {
+                    return json_decode($messageNoSubscriptionFound);
+                }
+            }
+
             if ($language === 'sv') { // Ugly hack to make Swedish-Finnish customers work, do not remove!
                 return $this->validateSubscriptionInBmd($subscriptionId, $postalCode, 'sf', $brandCode);
             }
-            return false;
+
+            return json_decode('{"message":"UndefinedError"}');
 
         }
     }
